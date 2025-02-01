@@ -17,33 +17,6 @@ export class BookSellerC extends BookSellerApiClient {
     return this.fetchBooks("by-author", queryParam, limit);
   }
 
-  protected async fetchBooks(
-    path: string,
-    queryParam: string | number,
-    limit: number
-  ): Promise<Book[]> {
-    try {
-      const response = await fetch(
-        `${this.apiUrl}/${path}?query=${queryParam}&maxResults=${limit}&format=${this.format}`
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `${this.apiUrl} API request failed with status ${response.status}`
-        );
-      }
-
-      //Implement JSON or XML handling logic
-      return this.format === "xml"
-        ? this.handleXmlResponse(await response.text())
-        : this.handleJsonResponse(await response.json());
-    } catch (error) {
-      console.error(`Error fetching books from ${this.apiUrl}:`, error);
-      notifyApiOwner(error, path, queryParam, this.apiUrl);
-      return [];
-    }
-  }
-
   // Takes the raw mock xml book data from the API and converts into our specified Book format.
   protected async handleXmlResponse(xmlString: string): Promise<Book[]> {
     try {
@@ -68,5 +41,30 @@ export class BookSellerC extends BookSellerApiClient {
       console.error("Error parsing XML response:", error);
       return [];
     }
+  }
+
+  /**
+   * Placeholder implementation for handling JSON responses.
+   *
+   * Currently, this method returns mock data.
+   * If in the future a proper JSON format is introduced for BookSellerC,
+   * replace this with appropriate mapping logic to convert API response
+   * into the Book model.
+   *
+   * @param jsonData - The raw JSON response (to be mapped in the future).
+   * @returns A mock array of Book objects for now.
+   */
+  protected handleJsonResponse(jsonData: any): Book[] {
+    return [
+      {
+        title: "Mock JSON Book",
+        author: "Mock JSON Author",
+        isbn: "111-1111111111",
+        quantity: 5,
+        price: "$19.99",
+        year: 2024,
+        publisher: "Mock JSON Publisher",
+      },
+    ];
   }
 }

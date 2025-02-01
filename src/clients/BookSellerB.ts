@@ -3,7 +3,7 @@ import { Book, BookSellerBList, ValidApiFormats } from "../types/Book";
 import { BookSellerApiClient } from "./BookSellerApiClient";
 
 export class BookSellerB extends BookSellerApiClient {
-  private apiUrl: string = "http://api.bookseller-b.com";
+  protected apiUrl: string = "http://api.bookseller-b.com";
 
   constructor(format: ValidApiFormats = "json") {
     super(format);
@@ -23,40 +23,13 @@ export class BookSellerB extends BookSellerApiClient {
     return this.fetchBooks("by-publisher", queryParam, limit);
   }
 
-  protected async fetchBooks(
-    endpoint: string,
-    queryParam: string | number,
-    limit: number
-  ): Promise<Book[]> {
-    try {
-      const response = await fetch(
-        `${this.apiUrl}/${endpoint}?query=${queryParam}&maxResults=${limit}&format=${this.format}`
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `${this.apiUrl} API request failed with status ${response.status}`
-        );
-      }
-
-      //Implement JSON or XML handling logic
-      return this.format === "json"
-        ? this.handleJsonResponse(await response.json())
-        : this.handleXmlResponse(await response.text());
-    } catch (error) {
-      console.error(`Error fetching books from ${this.apiUrl}:`, error);
-      notifyApiOwner(error, endpoint, queryParam, this.apiUrl);
-      return [];
-    }
-  }
-
   // Custom mapping for JSON response
   protected handleJsonResponse(data: BookSellerBList[]): Book[] {
     try {
       if (!Array.isArray(data)) {
         throw new Error("Invalid JSON format: Expected an array of books");
       }
-  
+
       return data.map(
         (bookInfo: BookSellerBList): Book => ({
           title: bookInfo.item.name || "Unknown Title",
@@ -73,5 +46,28 @@ export class BookSellerB extends BookSellerApiClient {
       return [];
     }
   }
-  
+
+  /**
+   * Placeholder implementation for handling XML responses.
+   *
+   * Currently, BookSellerB only returns JSON, so this method returns mock data.
+   * If in the future XML responses are introduced, replace this with proper
+   * XML parsing logic to extract book details and map them to the Book model.
+   *
+   * @param rawXmlBooks - The raw XML response (to be parsed in the future).
+   * @returns A mock array of Book objects for now.
+   */
+  protected handleXmlResponse(rawXmlBooks: any): Promise<Book[]> {
+    return Promise.resolve([
+      {
+        title: "Mock XML Book",
+        author: "Mock Author",
+        isbn: "000-0000000000",
+        quantity: 10,
+        price: "$9.99",
+        year: 2023,
+        publisher: "Mock Publisher",
+      },
+    ]);
+  }
 }

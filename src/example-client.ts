@@ -29,8 +29,8 @@ async function main() {
     console.log("Books by author from seller B ==>>:", booksByAuthorB);
 
     // Fetch XML books records by year from book seller C
-    // const booksByAuthorC = await bookSellerC.getBooksByAuthor("Doubleday", 5);
-    // console.log("Books by Year from seller C ==>>:", booksByAuthorC);
+    const booksByAuthorC = await bookSellerC.getBooksByAuthor("Doubleday", 5);
+    console.log("Books by Year from seller C ==>>:", booksByAuthorC);
 
     // Add more query types here as per book seller
   } catch (error) {
